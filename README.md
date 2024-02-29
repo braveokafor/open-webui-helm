@@ -4,6 +4,8 @@
 
 Chart to deploy Open WebUI, a ChatGPT-Style Web UI Client for Ollama 🦙.
 
+![Open WebUI Demo](https://github.com/ollama-webui/ollama-webui/blob/main/demo.gif?raw=true)
+
 ## TL;DR
 
 ```sh
