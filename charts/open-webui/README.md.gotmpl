@@ -26,9 +26,9 @@ helm install ollama braveokafor/open-webui
 
 Deploy [Open WebUI](https://github.com/ollama-webui/ollama-webui) on Kubernetes easily with this Helm chart. 
 
-It enables you to run a ChatGPT-style web UI client, with a variety of open-source large language models available at [ollama.ai/library](ollama.ai/library). 
+It enables you to run a ChatGPT-style web UI client, with a variety of open-source large language models available at [ollama.ai/library](ollama.ai/library).  
 
-> **Note**: This uses the [Ollama](https://github.com/braveokafor/ollama-helm/) chart (subchart).
+Alternatively, you can also also run against the OpenAI API with an API Key.
 
 {{ template "chart.sourcesSection" . }}
 
@@ -76,19 +76,20 @@ Alternatively, a YAML file that specifies the values for the above parameters ca
 helm install ollama -f values.yaml braveokafor/open-webui
 ```
 
-Example fully configured `values.yaml`:
+Example fully configured `values.yaml` to setup with Ollama:
 
 ```yaml
 # values.yaml
 ollama:
   install: true
+  enabled: true
   ollama:
     gpu:
       enabled: true
     models:
       - gemma
+      - mistral
   nodeSelector:
-    cloud.google.com/gke-spot: "true"
     cloud.google.com/gke-accelerator: "nvidia-tesla-t4"
 resources:
   requests:
@@ -102,7 +103,30 @@ ingress:
     ingressClassName: gce
   tls:
     enabled: true
-    selfSigned: false
+```
+
+Example fully configured `values.yaml` to setup with OpenAI:
+
+```yaml
+# values.yaml
+openai:
+  enabled: true
+  apiKey: "DX0mvZ6hQvUpM3FSL9qj58KTsbFwPYNsvgT0ztAiYA2q-eWsrxoQ"
+ollama:
+  install: false
+  enabled: false
+resources:
+  requests:
+    memory: 2048Mi
+    cpu: 1000m
+ingress:
+  enabled: true
+  hostname: ollama.braveokafor.com
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ollama
+    ingressClassName: gce
+  tls:
+    enabled: true
 ```
 
 ## Overrides
@@ -125,6 +149,16 @@ ingress:
   {{- end }}
 {{- end }}
 
+## OpenAI parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "openai" .Key }}
+| {{ .Key }} | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
 ## Image parameters
 
 | Key | Type | Default | Description |
@@ -140,7 +174,7 @@ ingress:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 {{- range .Values }}
-  {{- if not (or  (hasPrefix "ollama" .Key) (hasPrefix "image" .Key) (hasPrefix "ingress" .Key) (hasPrefix "service" .Key) (hasPrefix "persistence" .Key) (hasPrefix "serviceAccount" .Key) (or (eq .Key "nameOverride") (eq .Key "fullnameOverride"))) }}
+  {{- if not (or  (hasPrefix "ollama" .Key) (hasPrefix "image" .Key) (hasPrefix "ingress" .Key) (hasPrefix "service" .Key) (hasPrefix "persistence" .Key) (hasPrefix "serviceAccount" .Key) (hasPrefix "openai" .Key) (or (eq .Key "nameOverride") (eq .Key "fullnameOverride"))) }}
 | {{ .Key }} | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
   {{- end }}
 {{- end }}

@@ -24,9 +24,9 @@ helm install ollama braveokafor/open-webui
 
 Deploy [Open WebUI](https://github.com/ollama-webui/ollama-webui) on Kubernetes easily with this Helm chart.
 
-It enables you to run a ChatGPT-style web UI client, with a variety of open-source large language models available at [ollama.ai/library](ollama.ai/library).
+It enables you to run a ChatGPT-style web UI client, with a variety of open-source large language models available at [ollama.ai/library](ollama.ai/library). 
 
-> **Note**: This uses the [Ollama](https://github.com/braveokafor/ollama-helm/) chart (subchart).
+Alternatively, you can also also run against the OpenAI API with an API Key.
 
 ## Source Code
 
@@ -85,19 +85,20 @@ Alternatively, a YAML file that specifies the values for the above parameters ca
 helm install ollama -f values.yaml braveokafor/open-webui
 ```
 
-Example fully configured `values.yaml`:
+Example fully configured `values.yaml` to setup with Ollama:
 
 ```yaml
 # values.yaml
 ollama:
   install: true
+  enabled: true
   ollama:
     gpu:
       enabled: true
     models:
       - gemma
+      - mistral
   nodeSelector:
-    cloud.google.com/gke-spot: "true"
     cloud.google.com/gke-accelerator: "nvidia-tesla-t4"
 resources:
   requests:
@@ -111,7 +112,30 @@ ingress:
     ingressClassName: gce
   tls:
     enabled: true
-    selfSigned: false
+```
+
+Example fully configured `values.yaml` to setup with OpenAI:
+
+```yaml
+# values.yaml
+openai:
+  enabled: true
+  apiKey: "DX0mvZ6hQvUpM3FSL9qj58KTsbFwPYNsvgT0ztAiYA2q-eWsrxoQ"
+ollama:
+  install: false
+  enabled: false
+resources:
+  requests:
+    memory: 2048Mi
+    cpu: 1000m
+ingress:
+  enabled: true
+  hostname: ollama.braveokafor.com
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ollama
+    ingressClassName: gce
+  tls:
+    enabled: true
 ```
 
 ## Overrides
@@ -125,8 +149,19 @@ ingress:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ollama.externalURL | string | `""` | External Ollama API URL |
-| ollama.install | bool | `true` | Install Ollama |
+| ollama.enabled | bool | `true` | Inject Ollama API Environment Variables |
+| ollama.externalURL | string | `""` | External Ollama API URL (if Chart is not installed) |
+| ollama.install | bool | `true` | Install Ollama Helm Chart |
+
+## OpenAI parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| openai.apiKey | string | `""` | OpenAI API Key |
+| openai.baseUrl | string | `"https://api.openai.com/v1"` | OpenAI API API URL |
+| openai.enabled | bool | `false` | Inject OpenAI API Environment Variables |
+| openai.existingApiKeySecret | string | `""` | Name of an existing secret resource containing the OpenAI API credentials |
+| openai.existingApiKeySecretKey | string | `"openai-api-key"` | Name of the existing secret's key containing the OpenAI API credentials |
 
 ## Image parameters
 
