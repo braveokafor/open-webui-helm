@@ -63,7 +63,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         env:
-          {{- if .Values.ollama.enabled }}
+          {{- if or .Values.ollama.enabled .Values.ollama.externalURL }}
           - name: OLLAMA_API_BASE_URL
             value: {{ include "ollama.url" . | quote }}
           {{- end }}
@@ -89,6 +89,10 @@ spec:
         {{- end }}
         - name: webui-data
           mountPath: /app/backend/data
+        {{- if .Values.litellm.enabled }}
+        - name: litellm-config
+          mountPath: /app/backend/data/litellm
+        {{- end }}
         ports:
         - name: http
           containerPort: {{ .Values.containerPorts.http }}
@@ -149,6 +153,11 @@ spec:
             claimName: {{ default (include "webui.fullname" .) .Values.persistence.existingClaim }}
         {{- else }}
           emptyDir: {}
+        {{- end }}
+        {{- if .Values.litellm.enabled }}
+        - name: litellm-config
+          configMap:
+            name: {{ include "webui.fullname" . }}-litellm-config
         {{- end }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 6}}

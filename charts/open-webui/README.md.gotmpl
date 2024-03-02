@@ -28,7 +28,7 @@ Deploy [Open WebUI](https://github.com/ollama-webui/ollama-webui) on Kubernetes 
 
 It enables you to run a ChatGPT-style web UI client, with a variety of open-source large language models available at [ollama.ai/library](ollama.ai/library).  
 
-Alternatively, you can also also run against the OpenAI API with an API Key.
+Alternatively, you can also also run against the OpenAI API or LiteLLM.
 
 {{ template "chart.sourcesSection" . }}
 
@@ -81,7 +81,6 @@ Example fully configured `values.yaml` to setup with Ollama:
 ```yaml
 # values.yaml
 ollama:
-  install: true
   enabled: true
   ollama:
     gpu:
@@ -113,7 +112,35 @@ openai:
   enabled: true
   apiKey: "DX0mvZ6hQvUpM3FSL9qj58KTsbFwPYNsvgT0ztAiYA2q-eWsrxoQ"
 ollama:
-  install: false
+  enabled: false
+resources:
+  requests:
+    memory: 2048Mi
+    cpu: 1000m
+ingress:
+  enabled: true
+  hostname: ollama.braveokafor.com
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ollama
+    ingressClassName: gce
+  tls:
+    enabled: true
+```
+
+Example fully configured `values.yaml` to setup with LiteLLM:
+
+```yaml
+# values.yaml
+litellm:
+  enabled: true
+  config:
+    model_list:
+      - model_name: gpt-3.5
+        litellm_params:
+          model: gpt-3.5-turbo
+          api_base: https://api.openai.com/v1
+          api_key: "Ec2CWgmxnJRhdMSIlkwZbrFpxDJnuzSUHnVVDpUUaM62U4NavRIL"
+ollama:
   enabled: false
 resources:
   requests:
@@ -159,6 +186,16 @@ ingress:
   {{- end }}
 {{- end }}
 
+## LiteLLM parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "litellm" .Key }}
+| {{ .Key }} | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
 ## Image parameters
 
 | Key | Type | Default | Description |
@@ -174,7 +211,7 @@ ingress:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 {{- range .Values }}
-  {{- if not (or  (hasPrefix "ollama" .Key) (hasPrefix "image" .Key) (hasPrefix "ingress" .Key) (hasPrefix "service" .Key) (hasPrefix "persistence" .Key) (hasPrefix "serviceAccount" .Key) (hasPrefix "openai" .Key) (or (eq .Key "nameOverride") (eq .Key "fullnameOverride"))) }}
+  {{- if not (or  (hasPrefix "ollama" .Key) (hasPrefix "image" .Key) (hasPrefix "ingress" .Key) (hasPrefix "service" .Key) (hasPrefix "persistence" .Key) (hasPrefix "serviceAccount" .Key) (hasPrefix "openai" .Key) (hasPrefix "litellm" .Key) (or (eq .Key "nameOverride") (eq .Key "fullnameOverride"))) }}
 | {{ .Key }} | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
   {{- end }}
 {{- end }}

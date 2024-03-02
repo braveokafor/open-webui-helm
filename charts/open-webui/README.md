@@ -1,6 +1,6 @@
 # Open WebUI Helm
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 0.1.106](https://img.shields.io/badge/AppVersion-0.1.106-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![AppVersion: 0.1.107](https://img.shields.io/badge/AppVersion-0.1.107-informational?style=flat-square)
 
 Chart to deploy Open WebUI, a ChatGPT-Style Web UI Client for Ollama 🦙.
 
@@ -26,7 +26,7 @@ Deploy [Open WebUI](https://github.com/ollama-webui/ollama-webui) on Kubernetes 
 
 It enables you to run a ChatGPT-style web UI client, with a variety of open-source large language models available at [ollama.ai/library](ollama.ai/library). 
 
-Alternatively, you can also also run against the OpenAI API with an API Key.
+Alternatively, you can also also run against the OpenAI API or LiteLLM.
 
 ## Source Code
 
@@ -90,7 +90,6 @@ Example fully configured `values.yaml` to setup with Ollama:
 ```yaml
 # values.yaml
 ollama:
-  install: true
   enabled: true
   ollama:
     gpu:
@@ -122,7 +121,35 @@ openai:
   enabled: true
   apiKey: "DX0mvZ6hQvUpM3FSL9qj58KTsbFwPYNsvgT0ztAiYA2q-eWsrxoQ"
 ollama:
-  install: false
+  enabled: false
+resources:
+  requests:
+    memory: 2048Mi
+    cpu: 1000m
+ingress:
+  enabled: true
+  hostname: ollama.braveokafor.com
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ollama
+    ingressClassName: gce
+  tls:
+    enabled: true
+```
+
+Example fully configured `values.yaml` to setup with LiteLLM:
+
+```yaml
+# values.yaml
+litellm:
+  enabled: true
+  config:
+    model_list:
+      - model_name: gpt-3.5
+        litellm_params:
+          model: gpt-3.5-turbo
+          api_base: https://api.openai.com/v1
+          api_key: "Ec2CWgmxnJRhdMSIlkwZbrFpxDJnuzSUHnVVDpUUaM62U4NavRIL"
+ollama:
   enabled: false
 resources:
   requests:
@@ -149,9 +176,8 @@ ingress:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ollama.enabled | bool | `true` | Inject Ollama API Environment Variables |
-| ollama.externalURL | string | `""` | External Ollama API URL (if Chart is not installed) |
-| ollama.install | bool | `true` | Install Ollama Helm Chart |
+| ollama.enabled | bool | `true` | Install Ollama Helm Chart |
+| ollama.externalURL | string | `""` | External Ollama API URL (Can be used even if Ollama is not enabled/ installed) |
 
 ## OpenAI parameters
 
@@ -163,13 +189,20 @@ ingress:
 | openai.existingApiKeySecret | string | `""` | Name of an existing secret resource containing the OpenAI API credentials |
 | openai.existingApiKeySecretKey | string | `"openai-api-key"` | Name of the existing secret's key containing the OpenAI API credentials |
 
+## LiteLLM parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| litellm.config | object | `[]` (See [values.yaml]) | LiteLLM `config.yaml` |
+| litellm.enabled | bool | `false` | Mount LiteLLM `config.yaml` |
+
 ## Image parameters
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | image.imagePullPolicy | string | `"IfNotPresent"` | Image pull policy for Open WebUI |
 | image.repository | string | `"ghcr.io/open-webui/open-webui"` | Repository to use for Open WebUI |
-| image.tag | string | `"v0.1.106"` | Tag to use for Open WebUI |
+| image.tag | string | `"v0.1.107"` | Tag to use for Open WebUI |
 | imagePullSecrets | list | `[]` | Secrets with credentials to pull images from a private registry |
 
 ## General parameters
