@@ -346,7 +346,22 @@ ingress:
 
 ## Ollama configuration parameters
 ollama:
-  # -- Install Ollama
+  # -- Install Ollama Helm Chart
   install: true
-  # -- External Ollama API URL
+  # -- Inject Ollama API Environment Variables
+  enabled: true
+  # -- External Ollama API URL (if Chart is not installed)
   externalURL: ""
+
+## OpenAI configuration parameters
+openai:
+  # -- Inject OpenAI API Environment Variables
+  enabled: false
+  # -- OpenAI API API URL
+  baseUrl: "https://api.openai.com/v1"
+  # -- OpenAI API Key
+  apiKey: ""
+  # -- Name of an existing secret resource containing the OpenAI API credentials
+  existingApiKeySecret: ""
+  # -- Name of the existing secret's key containing the OpenAI API credentials
+  existingApiKeySecretKey: "openai-api-key"

@@ -85,7 +85,7 @@ Create a default fully qualified Ollama URL.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "ollama.url" -}}
-{{- if .Values.ollama.install }}
+{{- if .Values.ollama.enabled }}
   {{- $serviceName := default .Chart.Name .Values.ollama.nameOverride -}}
   {{- $fullname := printf "http://%s-%s.%s.svc.cluster.local:%d/api" (.Release.Name) $serviceName (.Release.Namespace) (.Values.ollama.service.servicePortHttp | int) -}}
   {{- $truncated := trunc 63 $fullname -}}
@@ -93,5 +93,31 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
   {{ print $finalName -}}
 {{- else -}}
   {{ print .Values.ollama.externalURL -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return OpenAI API Secret Name
+*/}}
+{{- define "openai.apiKeySecretName" -}}
+{{- if .Values.openai.enabled }}
+    {{- if .Values.openai.existingApiKeySecret -}}
+    {{- print .Values.openai.existingApiKeySecret -}}
+    {{- else -}}
+    {{- printf "%s-%s" (include "webui.fullname" .) "openai-api-key" -}}
+    {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return OpenAI API Secret key
+*/}}
+{{- define "openai.apiKeySecretKey" -}}
+{{- if .Values.openai.enabled }}
+    {{- if .Values.openai.existingApiKeySecretKey -}}
+    {{- print .Values.openai.existingApiKeySecretKey -}}
+    {{- else -}}
+    {{- print "openai-api-key" -}}
+    {{- end -}}
 {{- end -}}
 {{- end -}}
