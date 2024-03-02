@@ -76,8 +76,8 @@ image:
   # -- Repository to use for Open WebUI
   repository: "ghcr.io/open-webui/open-webui"
   # -- Tag to use for Open WebUI
-  # @default -- `"v0.1.106"`
-  tag: "git-a181b2b"  # v0.1.106
+  # @default -- `"v0.1.107"`
+  tag: "git-6c70d0f" # v0.1.107
   # -- Image pull policy for Open WebUI
   imagePullPolicy: "IfNotPresent"
 
@@ -347,10 +347,8 @@ ingress:
 ## Ollama configuration parameters
 ollama:
   # -- Install Ollama Helm Chart
-  install: true
-  # -- Inject Ollama API Environment Variables
   enabled: true
-  # -- External Ollama API URL (if Chart is not installed)
+  # -- External Ollama API URL (Can be used even if Ollama is not enabled/ installed)
   externalURL: ""
 
 ## OpenAI configuration parameters
@@ -365,3 +363,15 @@ openai:
   existingApiKeySecret: ""
   # -- Name of the existing secret's key containing the OpenAI API credentials
   existingApiKeySecretKey: "openai-api-key"
+
+## OpenAI configuration parameters
+litellm:
+  # -- Mount LiteLLM `config.yaml`
+  enabled: false
+  # -- LiteLLM `config.yaml`
+  # @default -- `[]` (See [values.yaml])
+  config:
+    general_settings: {}
+    litellm_settings: {}
+    model_list: []
+    router_settings: {}
