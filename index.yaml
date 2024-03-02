@@ -5,6 +5,40 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 0.1.106
+    created: "2024-03-02T10:21:07.168198496Z"
+    dependencies:
+    - condition: ollama.install
+      name: ollama
+      repository: https://charts.braveokafor.com
+      tags:
+      - ollama
+      version: 0.1.x
+    description: "Chart to deploy Open WebUI, a ChatGPT-Style Web UI Client for Ollama
+      \U0001F999."
+    digest: f50382bf45abb6a676d27b2274ceaf5fca18316a831137586e7ec39a0c58c61b
+    home: https://openwebui.com/
+    icon: https://openwebui.com/favicon.png/
+    keywords:
+    - ai
+    - ollama
+    - llm
+    - llama
+    maintainers:
+    - email: brave@braveokafor.com
+      name: braveokafor
+      url: https://braveokafor.com/
+    name: open-webui
+    sources:
+    - https://github.com/jmorganca/ollama/
+    - https://github.com/open-webui/open-webui
+    - https://github.com/braveokafor/open-webui-helm/
+    urls:
+    - https://github.com/braveokafor/open-webui-helm/releases/download/0.1.1/open-webui-0.1.1.tgz
+    version: 0.1.1
+  - annotations:
+      licenses: MIT
+    apiVersion: v2
+    appVersion: 0.1.106
     created: "2024-02-29T17:46:40.676077287Z"
     dependencies:
     - condition: ollama.install
@@ -35,4 +69,4 @@ entries:
     urls:
     - https://github.com/braveokafor/open-webui-helm/releases/download/0.1.0/open-webui-0.1.0.tgz
     version: 0.1.0
-generated: "2024-02-29T17:46:40.676088328Z"
+generated: "2024-03-02T10:21:07.168209987Z"
